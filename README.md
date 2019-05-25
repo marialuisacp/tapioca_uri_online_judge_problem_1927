@@ -1,4 +1,4 @@
-# uri_online_judge_problem_1927
+# Tapioca e a Chuva de Trufas
 Neste projeto resolvo um problema computacional do site https://www.urionlinejudge.com.br/
 
 O link do problema é [https://www.urionlinejudge.com.br/judge/pt/problems/view/1927](https://www.urionlinejudge.com.br/judge/pt/problems/view/1927).
