@@ -1,0 +1,179 @@
+import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.io.BufferedReader;
+import java.util.ArrayList;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.io.*;
+
+public class Main {
+	public static String inputFile = "input.txt";
+	public static long[] trufa;
+	public static long quantidade_trufas = 0;
+	public static ArrayList<Trufa> trufas = new ArrayList<Trufa>(2000);
+	public static Trufa n_trufa;
+	public static long[][][] save = new long[21][21][1001];
+
+	public static void main(String[] args) throws IOException {
+		trufa = new long[3];
+		readFiles();
+	}
+	public static void readFiles(){
+		long 	l = 0, number = 0, pos = 0, p = 1, sm = 0;
+		try {
+			// Scanner scanner = new Scanner(System.in);  
+			Scanner scanner = new Scanner(new FileReader(inputFile));
+			long[] 	par = new long[(int)2];
+			long n1 = 0, n2 = 0;
+			while(scanner.hasNextInt()) {
+				number = scanner.nextInt();
+				if(l == pos){
+					if(l > 0) tenta();
+					quantidade_trufas = number;
+					pos = pos + (number*3) + 1;
+					save = new long[21][21][1001];
+					trufas = new ArrayList<Trufa>(2000);
+				}else{
+					if( (pos - l) % 3 == 0){ n1 = number; }
+					if( (pos - l) % 3 == 2){ n2 = number; }
+					if( (pos - l) % 3 == 1){
+						trufa[0] = n1; 
+						trufa[1] = n2;
+						trufa[2] = number;
+						n_trufa = new Trufa(n1, n2, number);
+						trufas.add(n_trufa);
+						trufa = new long[3];
+					}
+				}
+				l++;
+			}
+		} catch (FileNotFoundException fnfe) {
+			System.out.println(fnfe);
+		}
+		tenta();
+	}
+	public static void tenta(){
+		Trufa[] array_trufas = new Trufa[2000];
+		Collections.sort(trufas);
+		for (int i = 0; i < quantidade_trufas; i++) {
+			array_trufas[i] = trufas.get(i);
+			// for (int j = 0; j < quantidade_trufas; j++)
+			// 	save[i][j] = -1;
+		}
+
+		long resultado = verifica(6, 6, 0, array_trufas, quantidade_trufas);
+		System.out.println(resultado);
+		
+		// int n, xp = 6, yp = 6, t = 0, c = 0;
+		// for(int i = 0, aux, auxt; i < quantidade_trufas; i++){
+		// 	aux = (int) Math.abs((array_trufas[i].x - xp) + (int) (array_trufas[i].y - yp));
+		// 	auxt = (int) Math.abs(array_trufas[i].t - t);
+
+		// 	if(aux < 0)
+		// 		aux = -1;
+
+		// 	if(aux <= auxt){
+		// 		c++;
+		// 		xp = (int) array_trufas[i].x;
+		// 		yp = (int) array_trufas[i].y;
+		// 		t = (int) array_trufas[i].t;
+		// 	}
+		// }
+
+		// System.out.println(c);
+
+	}
+
+
+	public static long verifica(long x, long y, long t, Trufa[] t_r, long q){
+		
+		if(q <= 0 || x < 1 || y < 1 || x > 20 || y > 20)
+			return 0;	
+		
+		if(q == 1){
+			if(t_r[(int)q-1].x == x && t_r[(int)q-1].y == y && t_r[(int)q-1].t == t){
+				System.out.println(t_r[(int)q-1].x +" " + t_r[(int)q-1].y + " " + t_r[(int)q-1].t + " result:1, x:" + x + ", y" + y + ", t:" + t); 
+				return 1;
+			}
+			else{
+				System.out.println(t_r[(int)q-1].x +" " + t_r[(int)q-1].y + " " + t_r[(int)q-1].t + " result:0, x:" + x + ", y" + y + ", t:" + t); 
+				// System.out.println(t_r[(int)q-1].x +" " + t_r[(int)q-1].y + " " + t_r[(int)q-1].t + " 0 " + q); 
+				return 0;
+			}
+		}
+
+		// System.out.println(x + " " + y + " " + t);
+		if(save[(int)x][(int)y][(int)t] != 0)
+			return save[(int)x][(int)y][(int)t];
+
+		long p = 0;
+
+		if(t_r[(int)q-1].t <= t){
+			if(t_r[(int)q-1].x == x && t_r[(int)q-1].y == y){
+				p = 1;
+				q = q-1;
+			}
+		}
+
+		long r1 = verifica(x+1, y, t+1, t_r, q);
+		long r2 = verifica(x-1, y, t+1, t_r, q);
+		long r3 = verifica(x, y+1, t+1, t_r, q);
+		long r4 = verifica(x, y-1, t+1, t_r, q);
+		long r5 = verifica(x, y, t+1, t_r, q);
+
+		save[(int)x][(int)y][(int)t] = Math.max((int)r1, Math.max((int)r2, Math.max(r3, Math.max((int)r4, (int)r5))));
+		save[(int)x][(int)y][(int)t] = save[(int)x][(int)y][(int)t] + p;
+
+		// System.out.println(r1 + " "+ r2 + " "+ r3 + " "+ r4 + " "+ r5 + " " + t + " " + q); 
+		// save[(int)x][(int)y][(int)t] = Math.max((int)r1, Math.max((int)r2, Math.max(r3, Math.max((int)r4, (int)r5))));
+
+
+		// if(t_r[(int)q-1].x == x && t_r[(int)q-1].y == y && t_r[(int)q-1].t == t){
+		// 	// System.out.println(x + " " + y + " " + t);
+		// 	save[(int)x][(int)y][(int)t] = save[(int)x][(int)y][(int)t] + 1;
+		// }
+		// long d = Math.abs(x - t_r[(int)(q-1)].x) + Math.abs(y - t_r[(int)(q-1)].y);
+		// if(d <= Math.abs((t_r[(int)(q-1)].t - t))){
+		// 	long r1 = 1 + verifica(t_r[(int)(q-1)].x, t_r[(int)(q-1)].y, t_r[(int)(q-1)].t, t_r, q-1);
+		// 	save[(int)q-1][(int)t] = r1;
+		// 	return r1;
+
+		// 	// long r2 = verifica(x, y, t, t_r, q-1);			
+		// 	// save[(int)q-1][(int)t] = (long) Math.max(r1, r2);
+		// 	// return save[(int)q-1][(int)t];
+		// }else{
+		// 	save[(int)q-1][(int)t] = verifica(x, y, t, t_r, q-1);
+		// 	return save[(int)q-1][(int)t];
+		// }
+		return save[(int)x][(int)y][(int)t];
+	}
+
+	public static class Trufa implements Comparable<Trufa>{
+		long x;
+		long y;
+		long t;
+		public Trufa(long x, long y, long t){
+			this.x = x;
+			this.y = y;
+			this.t = t;
+		}
+
+		@Override
+		public int compareTo(Trufa p_trufa) {
+			if(this.t > p_trufa.getTime()) {
+				return -1;
+			}
+			if(this.t < p_trufa.getTime()) {
+				return 1;
+			}
+			return 0;
+		}
+
+		public long getTime(){
+			return this.t;
+		}
+	}
+}
